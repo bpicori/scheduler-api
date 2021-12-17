@@ -26,17 +26,16 @@ export class StorageCacheService {
     return this.map.get(key);
   }
 
-  public async getById(id: string): Promise<ICommand | null> {
-    return this.storage.get(id);
-  }
-
   public set(key: number, value: ICommand): void {
     const val = this.map.get(key);
-    if (val) {
-      val.push(value);
-      this.map.set(key, val);
-    } else {
-      this.map.set(key, [value]);
+    const exists = val && val.find((v) => v.id === value.id);
+    if (!exists) {
+      if (val) {
+        val.push(value);
+        this.map.set(key, val);
+      } else {
+        this.map.set(key, [value]);
+      }
     }
   }
 

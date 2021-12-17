@@ -18,10 +18,10 @@ export class ExecutorService {
     private storage: StorageService,
     private httpService: HttpService,
     private logger: Logger,
+    private executor: ExecutorService,
   ) {}
 
   public async executeCycle() {
-    this.logger.debug('Executing cycle', 'ExecutorService');
     const now = unix();
     const commands = this.cache.get(now);
     if (commands && commands.length) {
@@ -34,6 +34,18 @@ export class ExecutorService {
       });
       this.cache.delete(now);
     }
+  }
+
+  public async sync() {
+    const all = await this.storage.getAllStatusPending();
+    const now = unix();
+    all.forEach((command) => {
+      if (command.time <= now) {
+        this.executor.execute(command);
+      } else {
+        this.cache.set(command.time, command);
+      }
+    });
   }
 
   public async execute(command: ICommand): Promise<void> {

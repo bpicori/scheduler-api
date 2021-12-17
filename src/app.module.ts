@@ -7,8 +7,8 @@ import { StorageCacheService } from './storage/storage-cache.service';
 import { StorageService } from './storage/storage.service';
 import { PostgresStorageService } from './storage/postgres-storage.service';
 import { ConfigService } from './config.service';
-import { unix } from './helpers';
 import { ExecutorService } from './executor.service';
+import { ElectionService } from './election.service';
 
 @Module({
   imports: [HttpModule],
@@ -31,29 +31,13 @@ import { ExecutorService } from './executor.service';
     StorageCacheService,
     CronService,
     ExecutorService,
+    ElectionService,
   ],
 })
 export class AppModule implements OnModuleInit {
-  public constructor(
-    private storage: StorageService,
-    private cache: StorageCacheService,
-    private executor: ExecutorService,
-    private cron: CronService,
-  ) {}
-  public async onModuleInit() {
-    const all = await this.storage.getAllStatusPending();
-    this.cron.start();
-    this.cron.subscribeSecond(() => {
-      this.executor.executeCycle();
-    });
-    const now = unix();
-    all.forEach((command) => {
-      if (command.time <= now) {
-        this.executor.execute(command);
-      } else {
-        this.cache.set(command.time, command);
-      }
-    });
-    console.log(all);
+  public constructor(private electionService: ElectionService) {}
+  public async onModuleInit(): Promise<any> {
+    console.log('Started election', ElectionService.name);
+    this.electionService.init();
   }
 }
