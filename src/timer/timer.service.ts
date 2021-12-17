@@ -16,7 +16,7 @@ export class TimerService {
   ) {}
 
   public async find(id: string): Promise<number> {
-    const timer = await this.storageCache.getById(id);
+    const timer = await this.storage.get(id);
     if (!timer) {
       throw new HttpException('Timer not found', 400);
     }
@@ -31,12 +31,14 @@ export class TimerService {
       seconds: timer.seconds,
     });
     const id = uuid();
+    // set to cache
     this.storageCache.set(time, {
       url: timer.url,
       id,
       time,
       status: CommandStatus.Pending,
     });
+    // save to db
     await this.storage.insert({
       id,
       time,
