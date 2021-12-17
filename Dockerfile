@@ -5,4 +5,4 @@ ADD package-lock.json .
 RUN npm install
 ADD . .
 RUN npm run build
-CMD npm run ${NODE_ENV:-dev}
+CMD npm run start:${NODE_ENV:-dev}

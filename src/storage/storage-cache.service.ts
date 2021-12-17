@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { IStorage } from './storage/IStorage';
+import { IStorage } from './IStorage';
 
 export enum CommandStatus {
   Pending = 'Pending',
@@ -15,7 +15,7 @@ export interface ICommand {
 }
 
 @Injectable()
-export class Store {
+export class StorageCache {
   private map: Map<number, ICommand[]>;
 
   public constructor(private storage: IStorage) {
@@ -41,9 +41,7 @@ export class Store {
     this.storage.insert(value).catch(console.error);
   }
 
-  public delete(key: number, commands: ICommand[]): void {
+  public delete(key: number): void {
     this.map.delete(key);
-    // commands.forEach();
-    // this.storage.update(val.id).catch(console.error);
   }
 }
