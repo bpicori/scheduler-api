@@ -1,4 +1,4 @@
-import { IsInt, IsUrl, Max, Min } from 'class-validator';
+import { IsInt, IsUrl, IsUUID, Matches, Max, Min } from 'class-validator';
 
 ///{hours: 4, minutes: 0, seconds: 1, url: "https://someserver.com"}
 export class TimerDto {
@@ -9,7 +9,7 @@ export class TimerDto {
   @Max(23, {
     message: 'hours should be from 0-23, but actual is $value',
   })
-  readonly hours: string;
+  readonly hours!: number;
 
   @IsInt({ message: 'Minutes must be an integer' })
   @Min(0, {
@@ -18,7 +18,7 @@ export class TimerDto {
   @Max(59, {
     message: 'minutes should be from 0-59, but actual is $value',
   })
-  readonly minutes: number;
+  readonly minutes!: number;
 
   @IsInt({ message: 'Seconds must be an integer' })
   @Min(0, {
@@ -27,8 +27,13 @@ export class TimerDto {
   @Max(59, {
     message: 'seconds should be from 0-59, but actual is $value',
   })
-  readonly seconds: number;
+  readonly seconds!: number;
 
   @IsUrl()
-  readonly url: string;
+  readonly url!: string;
+}
+
+export class UUID {
+  @IsUUID('4')
+  readonly id!: string;
 }

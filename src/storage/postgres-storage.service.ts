@@ -1,10 +1,10 @@
 import { Client } from 'pg';
-import { IStorage } from './IStorage';
-import { CommandStatus, ICommand } from './StorageCache';
+import { StorageService } from './storage.service';
+import { CommandStatus, ICommand } from './storage-cache.service';
 import { PostgresStorageConfig } from '../config.service';
 import { Logger } from '@nestjs/common';
 
-export class PostgresStorage extends IStorage {
+export class PostgresStorageService extends StorageService {
   private client: Client | null;
 
   public constructor(
@@ -18,7 +18,7 @@ export class PostgresStorage extends IStorage {
   public async init(): Promise<void> {
     this.client = new Client(this.config);
     await this.client.connect();
-    this.logger.log('Connection initialize', 'PostgresStorage');
+    this.logger.log('Connection initialize', 'PostgresStorageService');
   }
 
   public async get(id: string): Promise<ICommand | null> {
