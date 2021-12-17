@@ -1,0 +1,15 @@
+GET http://localhost:5000/timers/58b25c35-98ed-4e30-8ce6-0196f151a798 HTTP/1.1
+Accept: application/json
+
+###
+POST http://localhost:5000/timers HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "hours": 0,
+  "minutes": 0,
+  "seconds": 2,
+  "url": "https://www.google.com"
+}
+

@@ -19,10 +19,12 @@ export class ElectionService {
     this.client = new Etcd3({
       hosts: ['http://etcd-1:2380', 'http://etcd-2:2380', 'http://etcd-3:2380'],
     });
-    this.election = this.client.election('scheduler-election');
+    this.election = this.client.election('scheduler-election', 10);
+    this.logger.log('Init Election', ElectionService.name);
   }
 
   public init() {
+    this.logger.log('Init Election', ElectionService.name);
     this.startElection();
     this.observeLeader();
   }
@@ -52,7 +54,6 @@ export class ElectionService {
   private async observeLeader() {
     try {
       const observer = await this.election.observe();
-      this.logger.debug('Observe leader', ElectionService.name);
       observer.on('change', (leader) => {
         this.logger.log(
           `The current leader is: ${leader}`,

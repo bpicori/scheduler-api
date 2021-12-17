@@ -13,8 +13,24 @@ services:
       - "5858:5858"
     environment:
       NODE_ENV: dev
-      CLICKHOUSE_DATABASE: tracker_database
-      CLICKHOUSE_EVENTS_TABLE: events
+  scheduler2:
+    build: ./
+    container_name: scheduler2
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./:/home/node
+    ports:
+      - "5001:5000"
+      - "5859:5858"
+    environment:
+      NODE_ENV: dev
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
   postgres:
     image: postgres:12.1
     container_name: postgres

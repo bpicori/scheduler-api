@@ -1,17 +1,15 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { TimerDto } from './timer.dto';
-import {
-  CommandStatus,
-  StorageCacheService,
-} from '../storage/storage-cache.service';
 import { convertTimerToUnix, unix } from '../helpers';
 import { v4 as uuid } from 'uuid';
 import { StorageService } from '../storage/storage.service';
+import { CommandStatus } from '../types/command-status';
+import { CacheService } from '../storage/cache.service';
 
 @Injectable()
 export class TimerService {
   public constructor(
-    private storageCache: StorageCacheService,
+    private cache: CacheService,
     private storage: StorageService,
   ) {}
 
@@ -32,7 +30,7 @@ export class TimerService {
     });
     const id = uuid();
     // set to cache
-    this.storageCache.set(time, {
+    await this.cache.set(time, {
       url: timer.url,
       id,
       time,

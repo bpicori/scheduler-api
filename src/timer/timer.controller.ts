@@ -20,6 +20,9 @@ export class TimerController {
 
   @Post()
   async insert(@Body() timer: TimerDto): Promise<any> {
+    if (timer.hours === 0 && timer.minutes === 0 && timer.seconds === 0) {
+      throw new HttpException('You must set at least one time unit', 400);
+    }
     return this.timerService.insert(timer);
   }
 }

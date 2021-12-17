@@ -19,4 +19,8 @@ export class ConfigService {
   public get storage(): string {
     return config.get('storage');
   }
+
+  public get replicated(): boolean {
+    return config.get('replicated') === 'true';
+  }
 }

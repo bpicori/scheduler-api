@@ -1,24 +1,12 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { StorageService } from './storage.service';
-
-export enum CommandStatus {
-  Pending = 'Pending',
-  Success = 'Success',
-  Failed = 'Failed',
-}
-
-export interface ICommand {
-  id: string;
-  url: string;
-  time: number;
-  status: CommandStatus;
-}
+import { Injectable } from '@nestjs/common';
+import { ICommand } from '../types/command';
+import { CacheService } from './cache.service';
 
 @Injectable()
-export class StorageCacheService {
+export class InMemoryCacheService implements CacheService {
   private map: Map<number, ICommand[]>;
 
-  public constructor(private storage: StorageService) {
+  public constructor() {
     this.map = new Map();
   }
 
