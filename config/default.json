@@ -1,0 +1,11 @@
+{
+  "storage": "postgres",
+  "postgres": {
+    "user": "postgres",
+    "host": "postgres",
+    "database": "scheduler_database",
+    "password": "postgres",
+    "port": 5432,
+    "table": "timer"
+  }
+}
