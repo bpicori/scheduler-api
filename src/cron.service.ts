@@ -1,23 +1,25 @@
-export class Timer {
-  private seconds = 0;
+import { Injectable, OnModuleInit, Scope } from '@nestjs/common';
+import { unix } from './helpers';
+
+@Injectable({ scope: Scope.DEFAULT })
+export class CronService implements OnModuleInit {
+  onModuleInit() {
+    this.start();
+  }
+
   private secondSubscribers: Array<() => void> = [];
   private minuteSubscribers: Array<() => void> = [];
-  private intervalPointer: NodeJS.Timer;
-
-  constructor() {
-    this.seconds = new Date().getSeconds();
-  }
+  private intervalPointer: NodeJS.Timer | undefined;
 
   start() {
     if (this.intervalPointer) {
       clearInterval(this.intervalPointer);
     }
     this.intervalPointer = setInterval(() => {
-      if (this.seconds === 60) {
-        this.seconds = 0;
+      const now = unix();
+      if (now % 60 === 0) {
         this.minuteSubscribers.forEach((handler) => handler());
       } else {
-        this.seconds++;
       }
       this.secondSubscribers.forEach((handler) => handler());
     }, 1000);
