@@ -1,1 +1,14 @@
-{}
+{
+  "storage": "STORAGE",
+  "postgres": {
+    "user": "PG_USER",
+    "host": "PG_HOST",
+    "database": "PG_DB",
+    "password": "PG_PASSWORD",
+    "port": "PG_PORT",
+    "table": "TIMER_TABLE"
+  },
+  "redis": "REDIS_URL",
+  "replicated": "REPLICATED",
+  "etcd": "ETCD_URL"
+}

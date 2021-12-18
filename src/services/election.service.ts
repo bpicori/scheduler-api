@@ -3,6 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CronService } from './cron.service';
 import * as os from 'os';
 import { ExecutorService } from './executor.service';
+import { ConfigService } from './config.service';
 
 @Injectable()
 export class ElectionService {
@@ -15,9 +16,10 @@ export class ElectionService {
     private logger: Logger,
     private cronService: CronService,
     private executorService: ExecutorService,
+    private configService: ConfigService,
   ) {
     this.client = new Etcd3({
-      hosts: ['http://etcd-1:2380', 'http://etcd-2:2380', 'http://etcd-3:2380'],
+      hosts: this.configService.etcd,
     });
     this.election = this.client.election('scheduler-election', 10);
     this.logger.log('Init Election', ElectionService.name);
@@ -47,7 +49,9 @@ export class ElectionService {
       this.isLeader = false;
       this.cronService.stop();
       this.logger.log('Retrying election', ElectionService.name);
-      setTimeout(this.startElection, 5000);
+      setTimeout(() => {
+        this.startElection();
+      }, 5000);
     });
   }
 

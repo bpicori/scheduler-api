@@ -1,31 +1,30 @@
-import { IsInt, IsUrl, IsUUID, Matches, Max, Min } from 'class-validator';
+import { IsInt, IsUrl, IsUUID, Max, Min } from 'class-validator';
 
-///{hours: 4, minutes: 0, seconds: 1, url: "https://someserver.com"}
 export class TimerDto {
   @IsInt({ message: 'Hours must be an integer' })
   @Min(0, {
-    message: 'hours should be from 0-23, but actual is $value',
+    message: 'hours should be from 0-23',
   })
   @Max(23, {
-    message: 'hours should be from 0-23, but actual is $value',
+    message: 'hours should be from 0-23',
   })
   readonly hours!: number;
 
   @IsInt({ message: 'Minutes must be an integer' })
   @Min(0, {
-    message: 'minutes should be from 0-59, but actual is $value',
+    message: 'minutes should be from 0-59',
   })
   @Max(59, {
-    message: 'minutes should be from 0-59, but actual is $value',
+    message: 'minutes should be from 0-59',
   })
   readonly minutes!: number;
 
   @IsInt({ message: 'Seconds must be an integer' })
   @Min(0, {
-    message: 'seconds should be from 0-59, but actual is $value',
+    message: 'seconds should be from 0-59',
   })
   @Max(59, {
-    message: 'seconds should be from 0-59, but actual is $value',
+    message: 'seconds should be from 0-59',
   })
   readonly seconds!: number;
 

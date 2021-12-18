@@ -1,11 +1,11 @@
 import { HttpService } from '@nestjs/axios';
-import { unix } from './helpers';
+import { unix } from '../helpers';
 import { Injectable, Logger } from '@nestjs/common';
-import { StorageService } from './storage/storage.service';
+import { StorageService } from '../storage/storage.service';
 import { lastValueFrom } from 'rxjs';
-import { CommandStatus } from './types/command-status';
-import { ICommand } from './types/command';
-import { CacheService } from './storage/cache.service';
+import { CommandStatus } from '../types/command-status';
+import { ICommand } from '../types/command';
+import { CacheService } from '../storage/cache.service';
 
 @Injectable()
 export class ExecutorService {
@@ -38,23 +38,26 @@ export class ExecutorService {
   public async sync() {
     const all = await this.storage.getAllStatusPending();
     const now = unix();
+    let executed = 0;
     all.forEach((command) => {
       if (command.time <= now) {
         this.execute(command);
+        executed += 1;
       } else {
         this.cache.set(command.time, command);
       }
     });
     this.logger.debug(
-      `Executed sync, finished executing ${all.length} commands`,
+      `Executed sync, finished executing ${executed} commands`,
       ExecutorService.name,
     );
   }
 
   public async execute(command: ICommand): Promise<void> {
-    this.logger.debug(`Request to url: ${command.url}`, ExecutorService.name);
     try {
-      await lastValueFrom(this.httpService.get(`${command.url}/${command.id}`));
+      await lastValueFrom(
+        this.httpService.post(`${command.url}/${command.id}`),
+      );
       this.logger.debug(
         `Webhook: ${command.url} executed successfully`,
         ExecutorService.name,

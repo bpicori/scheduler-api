@@ -1,5 +1,5 @@
-import { Injectable, Logger, OnModuleInit, Scope } from '@nestjs/common';
-import { unix } from './helpers';
+import { Injectable, Logger } from '@nestjs/common';
+import { unix } from '../helpers';
 
 @Injectable()
 export class CronService {
@@ -18,7 +18,6 @@ export class CronService {
       const now = unix();
       if (now % 60 === 0) {
         this.minuteSubscribers.forEach((handler) => handler());
-      } else {
       }
       this.secondSubscribers.forEach((handler) => handler());
     }, 1000);

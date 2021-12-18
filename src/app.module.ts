@@ -1,16 +1,23 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import {
+  Logger,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  OnModuleInit,
+} from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { TimerController } from './timer/timer.controller';
 import { TimerService } from './timer/timer.service';
-import { CronService } from './cron.service';
+import { CronService } from './services/cron.service';
 import { InMemoryCacheService } from './storage/in-memory-cache.service';
 import { StorageService } from './storage/storage.service';
 import { PostgresStorageService } from './storage/postgres-storage.service';
-import { ConfigService } from './config.service';
-import { ExecutorService } from './executor.service';
-import { ElectionService } from './election.service';
+import { ConfigService } from './services/config.service';
+import { ExecutorService } from './services/executor.service';
+import { ElectionService } from './services/election.service';
 import { CacheService } from './storage/cache.service';
 import { RedisCacheService } from './storage/redis-cache.service';
+import { LoggerMiddleware } from './middleware/logger.middleware';
 
 @Module({
   imports: [HttpModule],
@@ -32,9 +39,9 @@ import { RedisCacheService } from './storage/redis-cache.service';
     {
       provide: CacheService,
       inject: [ConfigService, Logger],
-      useFactory: (config: ConfigService, logger: Logger) => {
+      useFactory: (config: ConfigService) => {
         if (config.replicated) {
-          return new RedisCacheService();
+          return new RedisCacheService(config);
         } else {
           return new InMemoryCacheService();
         }
@@ -47,11 +54,29 @@ import { RedisCacheService } from './storage/redis-cache.service';
     ElectionService,
   ],
 })
-export class AppModule implements OnModuleInit {
-  public constructor(private electionService: ElectionService) {}
+export class AppModule implements OnModuleInit, NestModule {
+  public constructor(
+    private electionService: ElectionService,
+    private config: ConfigService,
+    private cronService: CronService,
+    private executorService: ExecutorService,
+  ) {}
+
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
 
   public async onModuleInit(): Promise<any> {
-    console.log('Started election', ElectionService.name);
-    this.electionService.init();
+    if (this.config.replicated) {
+      this.electionService.init();
+    } else {
+      this.cronService.start();
+      this.cronService.subscribeSecond(() => {
+        this.executorService.executeCycle();
+      });
+      this.cronService.subscribeMinute(() => {
+        this.executorService.sync();
+      });
+    }
   }
 }

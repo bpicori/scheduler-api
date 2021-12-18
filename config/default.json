@@ -8,5 +8,7 @@
     "port": 5432,
     "table": "timer"
   },
-  "replicated": "true"
+  "redis": "redis://redis:6379",
+  "replicated": "true",
+  "etcd": "http://etcd-1:2380,http://etcd-2:2380,http://etcd-3:2380"
 }

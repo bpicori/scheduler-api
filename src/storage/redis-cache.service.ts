@@ -2,26 +2,33 @@ import { Injectable } from '@nestjs/common';
 import { ICommand } from '../types/command';
 import { CacheService } from './cache.service';
 import IoRedis, { Redis } from 'ioredis';
+import { ConfigService } from '../services/config.service';
 
 @Injectable()
 export class RedisCacheService implements CacheService {
   private redis?: Redis;
 
-  public constructor() {
-    this.redis = new IoRedis('redis://redis:6379');
+  public constructor(private config: ConfigService) {
+    this.redis = new IoRedis(this.config.redisUri);
   }
 
   public async get(key: number): Promise<ICommand[] | undefined> {
-    return this.redis?.lrange(key.toString(), 0, -1).then((res) => {
-      if (res.length === 0) {
+    return this.redis?.smembers(key.toString()).then((res) => {
+      if (res && res.length === 0) {
         return undefined;
       }
-      return res.map((item) => JSON.parse(item)) as ICommand[];
+      return res.map<ICommand>((item) => {
+        const [id, url, status] = JSON.parse(item);
+        return { id, url, time: key, status };
+      });
     });
   }
 
   public async set(key: number, value: ICommand): Promise<void> {
-    await this.redis?.lpush(key.toString(), JSON.stringify(value));
+    await this.redis?.sadd(
+      key.toString(),
+      JSON.stringify([value.id, value.url, value.status]),
+    );
   }
 
   public async delete(key: number): Promise<void> {

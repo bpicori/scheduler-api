@@ -1,6 +1,6 @@
 import { Client } from 'pg';
 import { StorageService } from './storage.service';
-import { PostgresStorageConfig } from '../config.service';
+import { PostgresStorageConfig } from '../services/config.service';
 import { Logger } from '@nestjs/common';
 import { ICommand } from '../types/command';
 import { CommandStatus } from '../types/command-status';
