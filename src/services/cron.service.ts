@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { unix } from '../helpers';
+import { unix } from '../helpers/unix';
 
 @Injectable()
 export class CronService {

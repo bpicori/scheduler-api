@@ -8,8 +8,10 @@ import {
 } from '@nestjs/common';
 import { TimerService } from './timer.service';
 import { TimerDto, UUID } from './timer.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('timers')
+@ApiTags('timers')
 export class TimerController {
   constructor(private readonly timerService: TimerService) {}
 
