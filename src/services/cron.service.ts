@@ -1,17 +1,16 @@
-import { Injectable, OnModuleInit, Scope } from '@nestjs/common';
-import { unix } from './helpers';
+import { Injectable, Logger } from '@nestjs/common';
+import { unix } from '../helpers/unix';
 
-@Injectable({ scope: Scope.DEFAULT })
-export class CronService implements OnModuleInit {
-  onModuleInit() {
-    this.start();
-  }
+@Injectable()
+export class CronService {
+  constructor(private logger: Logger) {}
 
   private secondSubscribers: Array<() => void> = [];
   private minuteSubscribers: Array<() => void> = [];
   private intervalPointer: NodeJS.Timer | undefined;
 
-  start() {
+  public start() {
+    this.logger.debug('CronService started');
     if (this.intervalPointer) {
       clearInterval(this.intervalPointer);
     }
@@ -19,10 +18,17 @@ export class CronService implements OnModuleInit {
       const now = unix();
       if (now % 60 === 0) {
         this.minuteSubscribers.forEach((handler) => handler());
-      } else {
       }
       this.secondSubscribers.forEach((handler) => handler());
     }, 1000);
+  }
+
+  public stop() {
+    this.logger.debug('CronService stopped');
+    if (this.intervalPointer) {
+      clearInterval(this.intervalPointer);
+      this.logger.debug('CronService stopped');
+    }
   }
 
   subscribeSecond(handler: () => void) {

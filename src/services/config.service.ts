@@ -12,11 +12,23 @@ export interface PostgresStorageConfig {
 
 @Injectable()
 export class ConfigService {
+  public get redisUri(): string {
+    return config.get('redis');
+  }
+
   public get postgres(): PostgresStorageConfig {
     return config.get('postgres');
   }
 
   public get storage(): string {
-    return config.get('storage');
+    return config.get<string>('storage');
+  }
+
+  public get replicated(): boolean {
+    return config.get<string>('replicated') === 'true';
+  }
+
+  public get etcd(): string[] {
+    return config.get<string>('etcd').split(',');
   }
 }

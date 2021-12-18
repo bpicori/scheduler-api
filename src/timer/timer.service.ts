@@ -1,22 +1,21 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { TimerDto } from './timer.dto';
-import {
-  CommandStatus,
-  StorageCacheService,
-} from '../storage/storage-cache.service';
-import { convertTimerToUnix, unix } from '../helpers';
 import { v4 as uuid } from 'uuid';
 import { StorageService } from '../storage/storage.service';
+import { CommandStatus } from '../types/command-status';
+import { CacheService } from '../storage/cache.service';
+import { unix } from '../helpers/unix';
+import { convertTimerToUnix } from '../helpers/convertTimerToUnix';
 
 @Injectable()
 export class TimerService {
   public constructor(
-    private storageCache: StorageCacheService,
+    private cache: CacheService,
     private storage: StorageService,
   ) {}
 
   public async find(id: string): Promise<number> {
-    const timer = await this.storageCache.getById(id);
+    const timer = await this.storage.get(id);
     if (!timer) {
       throw new HttpException('Timer not found', 400);
     }
@@ -31,12 +30,14 @@ export class TimerService {
       seconds: timer.seconds,
     });
     const id = uuid();
-    this.storageCache.set(time, {
+    // set to cache
+    await this.cache.set(time, {
       url: timer.url,
       id,
       time,
       status: CommandStatus.Pending,
     });
+    // save to db
     await this.storage.insert({
       id,
       time,

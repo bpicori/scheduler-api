@@ -1,60 +1,78 @@
-import {
-  CommandStatus,
-  ICommand,
-  StorageCacheService,
-} from './storage/storage-cache.service';
 import { HttpService } from '@nestjs/axios';
-import { unix } from './helpers';
 import { Injectable, Logger } from '@nestjs/common';
-import { StorageService } from './storage/storage.service';
+import { StorageService } from '../storage/storage.service';
 import { lastValueFrom } from 'rxjs';
+import { CommandStatus } from '../types/command-status';
+import { ICommand } from '../types/command';
+import { CacheService } from '../storage/cache.service';
+import { unix } from '../helpers/unix';
 
 @Injectable()
 export class ExecutorService {
-  private loggerContext = 'ExecutorService';
-
   public constructor(
-    private cache: StorageCacheService,
+    private cache: CacheService,
     private storage: StorageService,
     private httpService: HttpService,
     private logger: Logger,
   ) {}
 
   public async executeCycle() {
-    this.logger.debug('Executing cycle', 'ExecutorService');
     const now = unix();
-    const commands = this.cache.get(now);
+    const commands = await this.cache.get(now);
     if (commands && commands.length) {
       commands.forEach(async (command) => {
         await this.execute(command);
         this.logger.debug(
           `Command :${command.id} executed`,
-          this.loggerContext,
+          ExecutorService.name,
         );
       });
       this.cache.delete(now);
+      this.logger.debug(
+        `Executed cycle finished executing ${commands.length} commands`,
+        ExecutorService.name,
+      );
     }
   }
 
+  public async sync() {
+    const all = await this.storage.getAllStatusPending();
+    const now = unix();
+    let executed = 0;
+    all.forEach((command) => {
+      if (command.time <= now) {
+        this.execute(command);
+        executed += 1;
+      } else {
+        this.cache.set(command.time, command);
+      }
+    });
+    this.logger.debug(
+      `Executed sync, finished executing ${executed} commands`,
+      ExecutorService.name,
+    );
+  }
+
   public async execute(command: ICommand): Promise<void> {
-    this.logger.debug(`Request to url: ${command.url}`, this.loggerContext);
     try {
-      await lastValueFrom(this.httpService.get(`${command.url}/${command.id}`));
+      await lastValueFrom(
+        this.httpService.post(`${command.url}/${command.id}`),
+      );
       this.logger.debug(
         `Webhook: ${command.url} executed successfully`,
-        this.loggerContext,
+        ExecutorService.name,
       );
       await this.storage.updateStatus(command.id, CommandStatus.Success);
     } catch (error) {
       if (error instanceof Error) {
         this.logger.error(
           `Webhook: ${command.url} failed with error: ${error.message}`,
-          this.loggerContext,
+          ExecutorService.name,
         );
       } else {
         this.logger.error(
           `Webhook: ${command.url} failed with unknown error`,
-          this.loggerContext,
+          ExecutorService.name,
         );
       }
       await this.storage.updateStatus(command.id, CommandStatus.Failed);

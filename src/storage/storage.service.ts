@@ -1,5 +1,6 @@
-import { CommandStatus, ICommand } from './storage-cache.service';
 import { OnModuleInit } from '@nestjs/common';
+import { ICommand } from '../types/command';
+import { CommandStatus } from '../types/command-status';
 
 export abstract class StorageService implements OnModuleInit {
   abstract init(): Promise<void>;

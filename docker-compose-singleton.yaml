@@ -12,9 +12,9 @@ services:
       - "5000:5000"
       - "5858:5858"
     environment:
-      NODE_ENV: dev
-      CLICKHOUSE_DATABASE: tracker_database
-      CLICKHOUSE_EVENTS_TABLE: events
+      NODE_ENV: 'dev'
+      PORT: '5000'
+      REPLICATED: 'false'
   postgres:
     image: postgres:12.1
     container_name: postgres

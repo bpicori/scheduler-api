@@ -1,6 +1,5 @@
-export function unix(): number {
-  return Math.floor(Date.now() / 1000);
-}
+import { unix } from './unix';
+
 export function convertTimerToUnix({
   hours,
   minutes,

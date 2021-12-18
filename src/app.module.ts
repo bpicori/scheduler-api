@@ -1,14 +1,23 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import {
+  Logger,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  OnModuleInit,
+} from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { TimerController } from './timer/timer.controller';
 import { TimerService } from './timer/timer.service';
-import { CronService } from './cron.service';
-import { StorageCacheService } from './storage/storage-cache.service';
+import { CronService } from './services/cron.service';
+import { InMemoryCacheService } from './storage/in-memory-cache.service';
 import { StorageService } from './storage/storage.service';
 import { PostgresStorageService } from './storage/postgres-storage.service';
-import { ConfigService } from './config.service';
-import { unix } from './helpers';
-import { ExecutorService } from './executor.service';
+import { ConfigService } from './services/config.service';
+import { ExecutorService } from './services/executor.service';
+import { ElectionService } from './services/election.service';
+import { CacheService } from './storage/cache.service';
+import { RedisCacheService } from './storage/redis-cache.service';
+import { LoggerMiddleware } from './middleware/logger.middleware';
 
 @Module({
   imports: [HttpModule],
@@ -27,33 +36,47 @@ import { ExecutorService } from './executor.service';
         }
       },
     },
+    {
+      provide: CacheService,
+      inject: [ConfigService, Logger],
+      useFactory: (config: ConfigService) => {
+        if (config.replicated) {
+          return new RedisCacheService(config);
+        } else {
+          return new InMemoryCacheService();
+        }
+      },
+    },
     TimerService,
-    StorageCacheService,
+    InMemoryCacheService,
     CronService,
     ExecutorService,
+    ElectionService,
   ],
 })
-export class AppModule implements OnModuleInit {
+export class AppModule implements OnModuleInit, NestModule {
   public constructor(
-    private storage: StorageService,
-    private cache: StorageCacheService,
-    private executor: ExecutorService,
-    private cron: CronService,
+    private electionService: ElectionService,
+    private config: ConfigService,
+    private cronService: CronService,
+    private executorService: ExecutorService,
   ) {}
-  public async onModuleInit() {
-    const all = await this.storage.getAllStatusPending();
-    this.cron.start();
-    this.cron.subscribeSecond(() => {
-      this.executor.executeCycle();
-    });
-    const now = unix();
-    all.forEach((command) => {
-      if (command.time <= now) {
-        this.executor.execute(command);
-      } else {
-        this.cache.set(command.time, command);
-      }
-    });
-    console.log(all);
+
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+
+  public async onModuleInit(): Promise<any> {
+    if (this.config.replicated) {
+      this.electionService.init();
+    } else {
+      this.cronService.start();
+      this.cronService.subscribeSecond(() => {
+        this.executorService.executeCycle();
+      });
+      this.cronService.subscribeMinute(() => {
+        this.executorService.sync();
+      });
+    }
   }
 }
