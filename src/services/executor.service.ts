@@ -19,6 +19,7 @@ export class ExecutorService {
   public async executeCycle() {
     const now = unix();
     const commands = await this.cache.get(now);
+    this.logger.debug('Execute cycle');
     if (commands && commands.length) {
       commands.forEach(async (command) => {
         await this.execute(command);
@@ -55,9 +56,7 @@ export class ExecutorService {
 
   public async execute(command: ICommand): Promise<void> {
     try {
-      await lastValueFrom(
-        this.httpService.post(`${command.url}/${command.id}`),
-      );
+      await lastValueFrom(this.httpService.post(`${command.url}`));
       this.logger.debug(
         `Webhook: ${command.url} executed successfully`,
         ExecutorService.name,

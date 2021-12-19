@@ -28,7 +28,7 @@ export class TimerDto {
   })
   readonly seconds!: number;
 
-  @IsUrl()
+  @IsUrl({ host_whitelist: ['localhost'] })
   readonly url!: string;
 }
 

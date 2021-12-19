@@ -1,4 +1,5 @@
 {
+  "port": 5000,
   "storage": "postgres",
   "postgres": {
     "user": "postgres",
@@ -10,5 +11,8 @@
   },
   "redis": "redis://redis:6379",
   "replicated": "true",
-  "etcd": "http://etcd-1:2380,http://etcd-2:2380,http://etcd-3:2380"
+  "etcd": "http://etcd-1:2380,http://etcd-2:2380,http://etcd-3:2380",
+  "e2e": {
+    "api_url": "http://localhost:5000"
+  }
 }

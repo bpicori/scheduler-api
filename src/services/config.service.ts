@@ -12,6 +12,9 @@ export interface PostgresStorageConfig {
 
 @Injectable()
 export class ConfigService {
+  public get httpPort(): number {
+    return config.get('port');
+  }
   public get redisUri(): string {
     return config.get('redis');
   }
@@ -30,5 +33,9 @@ export class ConfigService {
 
   public get etcd(): string[] {
     return config.get<string>('etcd').split(',');
+  }
+
+  public getFromPath<T>(path: string): T {
+    return config.get<T>(path);
   }
 }
