@@ -22,8 +22,8 @@ For the persistence it uses 2 layers:
 2) cache (in memory if started singleton and redis if started replicated)
 
 ## Requirements
-1. Docker (current version I'm using is 20.10.1)
-2. docker-compose (current version I'm using is 1.29.2)
+1. Docker (tested using version 20.10.1)
+2. docker-compose (tested using version 1.29.2)
 3. Make for simplicity :) 
 
 

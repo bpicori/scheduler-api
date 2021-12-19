@@ -6,7 +6,7 @@ export class LoggerMiddleware implements NestMiddleware {
   private logger = new Logger('HTTP');
 
   /**
-   * Add a logger middleware to the web server to log all requests coming in
+   * Add a logger middleware to the web server to log all requests coming in.
    * @param request
    * @param response
    * @param next

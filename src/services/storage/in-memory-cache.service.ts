@@ -31,5 +31,6 @@ export class InMemoryCacheService implements CacheService {
     this.map.delete(key);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   public ping(): void {}
 }
