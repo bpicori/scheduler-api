@@ -21,7 +21,6 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
 import { StatusController } from './controllers/status.controller';
 
 @Module({
-  imports: [HttpModule],
   controllers: [TimerController, StatusController],
   providers: [
     ConfigService,

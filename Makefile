@@ -9,6 +9,9 @@ up-replicated:
 stop:
 	docker-compose ${composeFiles} stop $(filter-out $@,$(MAKECMDGOALS))
 
+down:
+	docker-compose ${composeFiles} down $(filter-out $@,$(MAKECMDGOALS))
+
 logs:
 	docker-compose ${composeFiles} logs -f -t --tail 30  $(filter-out $@,$(MAKECMDGOALS))
 

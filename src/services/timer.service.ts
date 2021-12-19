@@ -1,8 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { TimerDto } from '../types/timer.dto';
-import { v4 as uuid } from 'uuid';
 import { StorageService } from './storage/storage.service';
-import { CommandStatus } from '../types/command-status';
+import { Status } from '../types/status';
 import { CacheService } from './storage/cache.service';
 import { convertTimerToUnix } from '../helpers/convertTimerToUnix';
 import { timeRemaining } from '../helpers/timeRemaining';
@@ -33,7 +32,7 @@ export class TimerService {
     });
     const id = await this.storage.insert({
       time,
-      status: CommandStatus.Pending,
+      status: Status.Pending,
       url: timer.url,
     });
     // set to cache
@@ -41,7 +40,7 @@ export class TimerService {
       id,
       url: timer.url,
       time,
-      status: CommandStatus.Pending,
+      status: Status.Pending,
     });
     // save to db
     return { id };

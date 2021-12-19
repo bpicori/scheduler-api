@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { SuperTest, webHook } from './before';
 import { insert } from './helpers/insert';
 import { unix } from '../../src/helpers/unix';
-import { CommandStatus } from '../../src/types/command-status';
+import { Status } from '../../src/types/status';
 
 describe('Timer Read/Create', async () => {
   let id = -1;
@@ -56,7 +56,7 @@ describe('Timer Read/Create', async () => {
     const id = await insert({
       url: 'http://localhost:3001',
       time: now - 100,
-      status: CommandStatus.Pending,
+      status: Status.Pending,
     });
     await webHook.waitFor(id, 70);
   });

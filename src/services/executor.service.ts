@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { StorageService } from './storage/storage.service';
-import { CommandStatus } from '../types/command-status';
-import { ICommand } from '../types/command';
+import { Status } from '../types/status';
+import { WebHook } from '../types/webhook';
 import { CacheService } from './storage/cache.service';
 import { unix } from '../helpers/unix';
 import axios from 'axios';
@@ -54,7 +54,7 @@ export class ExecutorService {
     );
   }
 
-  public async execute(command: ICommand): Promise<void> {
+  public async execute(command: WebHook): Promise<void> {
     const url = addIdToUrl(command.url, command.id);
     try {
       await axios.post(url, {});
@@ -62,7 +62,7 @@ export class ExecutorService {
         `Webhook: ${command.url} executed successfully`,
         ExecutorService.name,
       );
-      await this.storage.updateStatus(command.id, CommandStatus.Success);
+      await this.storage.updateStatus(command.id, Status.Success);
     } catch (error) {
       if (error instanceof Error) {
         this.logger.error(
@@ -75,7 +75,7 @@ export class ExecutorService {
           ExecutorService.name,
         );
       }
-      await this.storage.updateStatus(command.id, CommandStatus.Failed);
+      await this.storage.updateStatus(command.id, Status.Failed);
     }
   }
 }

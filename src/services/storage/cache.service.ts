@@ -1,10 +1,10 @@
-import { ICommand } from '../../types/command';
+import { WebHook } from '../../types/webhook';
 
 export abstract class CacheService {
   abstract get(
     key: number,
-  ): ICommand[] | undefined | Promise<ICommand[] | undefined>;
-  abstract set(key: number, command: ICommand): void | Promise<void>;
+  ): WebHook[] | undefined | Promise<WebHook[] | undefined>;
+  abstract set(key: number, command: WebHook): void | Promise<void>;
   abstract delete(key: number): void | Promise<void>;
   abstract ping(): void | Promise<void>;
 }
