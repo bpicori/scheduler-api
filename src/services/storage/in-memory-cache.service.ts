@@ -30,4 +30,6 @@ export class InMemoryCacheService implements CacheService {
   public delete(key: number): void {
     this.map.delete(key);
   }
+
+  public ping(): void {}
 }

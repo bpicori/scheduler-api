@@ -34,4 +34,8 @@ export class RedisCacheService implements CacheService {
   public async delete(key: number): Promise<void> {
     await this.redis?.del(key.toString());
   }
+
+  public async ping(): Promise<void> {
+    await this.redis?.ping();
+  }
 }

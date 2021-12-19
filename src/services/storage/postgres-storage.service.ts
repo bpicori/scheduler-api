@@ -64,4 +64,11 @@ export class PostgresStorageService extends StorageService {
       [status, id],
     );
   }
+
+  public async ping(): Promise<void> {
+    if (!this.client) {
+      throw new Error('Postgres connection is not initialized');
+    }
+    await this.client.query('SELECT 1+1');
+  }
 }

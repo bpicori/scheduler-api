@@ -8,6 +8,7 @@ export abstract class StorageService implements OnModuleInit {
   abstract insert(command: Omit<ICommand, 'id'>): Promise<number>;
   abstract getAllStatusPending(): Promise<ICommand[]>;
   abstract updateStatus(id: number, status: CommandStatus): Promise<void>;
+  abstract ping(): Promise<void>;
 
   public async onModuleInit(): Promise<void> {
     await this.init();

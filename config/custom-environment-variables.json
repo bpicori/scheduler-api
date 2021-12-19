@@ -1,5 +1,6 @@
 {
   "storage": "STORAGE",
+  "port": "PORT",
   "postgres": {
     "user": "PG_USER",
     "host": "PG_HOST",
