@@ -1,4 +1,4 @@
-import { ICommand } from '../types/command';
+import { ICommand } from '../../types/command';
 
 export abstract class CacheService {
   abstract get(

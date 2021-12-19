@@ -10,7 +10,7 @@ export class CronService {
   private intervalPointer: NodeJS.Timer | undefined;
 
   public start() {
-    this.logger.debug('CronService started');
+    this.logger.debug('CronService started', CronService.name);
     if (this.intervalPointer) {
       clearInterval(this.intervalPointer);
     }
@@ -24,15 +24,15 @@ export class CronService {
   }
 
   public stop() {
-    this.logger.debug('CronService stopped');
     if (this.intervalPointer) {
       clearInterval(this.intervalPointer);
-      this.logger.debug('CronService stopped');
+      this.logger.debug('CronService stopped', CronService.name);
     }
   }
 
   subscribeSecond(handler: () => void) {
     if (!this.secondSubscribers.includes(handler)) {
+      this.logger.debug('Subscriber Second added handler', CronService.name);
       this.secondSubscribers.push(handler);
     }
   }
@@ -40,6 +40,7 @@ export class CronService {
   subscribeMinute(handler: () => void) {
     if (!this.minuteSubscribers.includes(handler)) {
       this.minuteSubscribers.push(handler);
+      this.logger.debug('Subscriber Minute added handler', CronService.name);
     }
   }
 }

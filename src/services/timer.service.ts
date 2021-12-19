@@ -1,9 +1,9 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { TimerDto } from '../types/timer.dto';
 import { v4 as uuid } from 'uuid';
-import { StorageService } from '../storage/storage.service';
+import { StorageService } from './storage/storage.service';
 import { CommandStatus } from '../types/command-status';
-import { CacheService } from '../storage/cache.service';
+import { CacheService } from './storage/cache.service';
 import { convertTimerToUnix } from '../helpers/convertTimerToUnix';
 import { timeRemaining } from '../helpers/timeRemaining';
 
@@ -17,7 +17,7 @@ export class TimerService {
   public async find(id: number): Promise<{ id: number; time_left: number }> {
     const timer = await this.storage.get(id);
     if (!timer) {
-      throw new HttpException('Timer not found', 400);
+      throw new HttpException('Timer not found', 404);
     }
     return {
       id,

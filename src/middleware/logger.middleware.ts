@@ -20,7 +20,7 @@ export class LoggerMiddleware implements NestMiddleware {
         return this.logger.warn(message);
       }
 
-      return this.logger.log(message);
+      return this.logger.log(message, LoggerMiddleware.name);
     });
 
     next();

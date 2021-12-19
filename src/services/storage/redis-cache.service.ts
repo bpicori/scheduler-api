@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ICommand } from '../types/command';
+import { ICommand } from '../../types/command';
 import { CacheService } from './cache.service';
 import IoRedis, { Redis } from 'ioredis';
-import { ConfigService } from '../services/config.service';
+import { ConfigService } from '../config.service';
 
 @Injectable()
 export class RedisCacheService implements CacheService {

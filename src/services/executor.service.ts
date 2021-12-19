@@ -1,10 +1,8 @@
-import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
-import { StorageService } from '../storage/storage.service';
-import { lastValueFrom } from 'rxjs';
+import { StorageService } from './storage/storage.service';
 import { CommandStatus } from '../types/command-status';
 import { ICommand } from '../types/command';
-import { CacheService } from '../storage/cache.service';
+import { CacheService } from './storage/cache.service';
 import { unix } from '../helpers/unix';
 import axios from 'axios';
 import { addIdToUrl } from '../helpers/addIdToUrl';
@@ -20,18 +18,18 @@ export class ExecutorService {
   public async executeCycle() {
     const now = unix();
     const commands = await this.cache.get(now);
-    this.logger.debug('Execute cycle');
+    this.logger.debug('Executing cycle', ExecutorService.name);
     if (commands && commands.length) {
       commands.forEach(async (command) => {
         await this.execute(command);
         this.logger.debug(
-          `Command :${command.id} executed`,
+          `Command ${command.id} executed`,
           ExecutorService.name,
         );
       });
       this.cache.delete(now);
       this.logger.debug(
-        `Executed cycle finished executing ${commands.length} commands`,
+        `Cycle: Finished executing ${commands.length} commands`,
         ExecutorService.name,
       );
     }
@@ -39,6 +37,7 @@ export class ExecutorService {
 
   public async sync() {
     const all = await this.storage.getAllStatusPending();
+    this.logger.debug('Executing sync', ExecutorService.name);
     const now = unix();
     let executed = 0;
     all.forEach((command) => {
@@ -50,7 +49,7 @@ export class ExecutorService {
       }
     });
     this.logger.debug(
-      `Executed sync, finished executing ${executed} commands`,
+      `Sync: Finished executing ${executed} commands`,
       ExecutorService.name,
     );
   }
