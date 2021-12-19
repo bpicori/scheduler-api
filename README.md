@@ -13,13 +13,9 @@
 
 ## Introduction
 
-This microservice starts with 2 intervals: 1 every second to run the upcoming webhooks and 1 every minute to execute the
-missed one. 
-Designed to start in 2 modes: `singleton` (deployed 1 single instance) and `replicated` (multi instance with
-leader-follower pattern for fail over). Replicated mode use Etcd service to elect the leader.
-For the persistence it uses 2 layers: 
-1) database (postgres)
-2) cache (in memory if started singleton and redis if started replicated)
+This microservice starts with 2 intervals: 1 every second to run the upcoming webhooks and 1 every minute to execute the missed one. Designed to start in 2 modes: singleton (deployed 1 single instance) and replicated (multi-instance with a leader-follower pattern for failover). The replicated mode uses the Etcd service to elect the leader. For the persistence it uses 2 layers:
+database (Postgres)
+cache (in memory if started singleton and Redis if started replicated)
 
 ## Requirements
 1. Docker (tested using version 20.10.1)
@@ -32,7 +28,7 @@ For the persistence it uses 2 layers:
 make up-singleton # to run the application in singleton mode
 ```
 ```bash
-make migrate-up # to create the table in db
+make migrate-up # to create the table in the database
 ``` 
 The port is set to 5000.
 ```bash

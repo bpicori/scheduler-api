@@ -7,7 +7,7 @@ import { Status } from '../../types/status';
 
 /**
  * Postgres' storage service using pg driver for PostgresSQL.
- * // TODO check if it's better migrate it to TypeORM
+ * // TODO check if it's better to migrate this service to TypeORM
  */
 export class PostgresStorageService extends StorageService {
   private client: Client | null;
