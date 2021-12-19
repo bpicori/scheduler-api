@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { ICommand } from '../types/command';
+import { WebHook } from '../../types/webhook';
 import { CacheService } from './cache.service';
 
 @Injectable()
 export class InMemoryCacheService implements CacheService {
-  private map: Map<number, ICommand[]>;
+  private map: Map<number, WebHook[]>;
 
   public constructor() {
     this.map = new Map();
   }
 
-  public get(key: number): ICommand[] | undefined {
+  public get(key: number): WebHook[] | undefined {
     return this.map.get(key);
   }
 
-  public set(key: number, value: ICommand): void {
+  public set(key: number, value: WebHook): void {
     const val = this.map.get(key);
     const exists = val && val.find((v) => v.id === value.id);
     if (!exists) {
@@ -30,4 +30,6 @@ export class InMemoryCacheService implements CacheService {
   public delete(key: number): void {
     this.map.delete(key);
   }
+
+  public ping(): void {}
 }

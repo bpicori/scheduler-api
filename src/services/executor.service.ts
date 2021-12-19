@@ -1,35 +1,35 @@
-import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
-import { StorageService } from '../storage/storage.service';
-import { lastValueFrom } from 'rxjs';
-import { CommandStatus } from '../types/command-status';
-import { ICommand } from '../types/command';
-import { CacheService } from '../storage/cache.service';
+import { StorageService } from './storage/storage.service';
+import { Status } from '../types/status';
+import { WebHook } from '../types/webhook';
+import { CacheService } from './storage/cache.service';
 import { unix } from '../helpers/unix';
+import axios from 'axios';
+import { addIdToUrl } from '../helpers/addIdToUrl';
 
 @Injectable()
 export class ExecutorService {
   public constructor(
     private cache: CacheService,
     private storage: StorageService,
-    private httpService: HttpService,
     private logger: Logger,
   ) {}
 
   public async executeCycle() {
     const now = unix();
     const commands = await this.cache.get(now);
+    this.logger.debug('Executing cycle', ExecutorService.name);
     if (commands && commands.length) {
       commands.forEach(async (command) => {
         await this.execute(command);
         this.logger.debug(
-          `Command :${command.id} executed`,
+          `Command ${command.id} executed`,
           ExecutorService.name,
         );
       });
       this.cache.delete(now);
       this.logger.debug(
-        `Executed cycle finished executing ${commands.length} commands`,
+        `Cycle: Finished executing ${commands.length} commands`,
         ExecutorService.name,
       );
     }
@@ -37,6 +37,7 @@ export class ExecutorService {
 
   public async sync() {
     const all = await this.storage.getAllStatusPending();
+    this.logger.debug('Executing sync', ExecutorService.name);
     const now = unix();
     let executed = 0;
     all.forEach((command) => {
@@ -48,34 +49,33 @@ export class ExecutorService {
       }
     });
     this.logger.debug(
-      `Executed sync, finished executing ${executed} commands`,
+      `Sync: Finished executing ${executed} commands`,
       ExecutorService.name,
     );
   }
 
-  public async execute(command: ICommand): Promise<void> {
+  public async execute(command: WebHook): Promise<void> {
+    const url = addIdToUrl(command.url, command.id);
     try {
-      await lastValueFrom(
-        this.httpService.post(`${command.url}/${command.id}`),
-      );
+      await axios.post(url, {});
       this.logger.debug(
         `Webhook: ${command.url} executed successfully`,
         ExecutorService.name,
       );
-      await this.storage.updateStatus(command.id, CommandStatus.Success);
+      await this.storage.updateStatus(command.id, Status.Success);
     } catch (error) {
       if (error instanceof Error) {
         this.logger.error(
-          `Webhook: ${command.url} failed with error: ${error.message}`,
+          `Webhook: ${url} failed with error: ${error.message}`,
           ExecutorService.name,
         );
       } else {
         this.logger.error(
-          `Webhook: ${command.url} failed with unknown error`,
+          `Webhook: ${url} failed with unknown error`,
           ExecutorService.name,
         );
       }
-      await this.storage.updateStatus(command.id, CommandStatus.Failed);
+      await this.storage.updateStatus(command.id, Status.Failed);
     }
   }
 }

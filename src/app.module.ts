@@ -6,22 +6,22 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
-import { TimerController } from './timer/timer.controller';
-import { TimerService } from './timer/timer.service';
+import { TimerController } from './controllers/timer.controller';
+import { TimerService } from './services/timer.service';
 import { CronService } from './services/cron.service';
-import { InMemoryCacheService } from './storage/in-memory-cache.service';
-import { StorageService } from './storage/storage.service';
-import { PostgresStorageService } from './storage/postgres-storage.service';
+import { InMemoryCacheService } from './services/storage/in-memory-cache.service';
+import { StorageService } from './services/storage/storage.service';
+import { PostgresStorageService } from './services/storage/postgres-storage.service';
 import { ConfigService } from './services/config.service';
 import { ExecutorService } from './services/executor.service';
 import { ElectionService } from './services/election.service';
-import { CacheService } from './storage/cache.service';
-import { RedisCacheService } from './storage/redis-cache.service';
+import { CacheService } from './services/storage/cache.service';
+import { RedisCacheService } from './services/storage/redis-cache.service';
 import { LoggerMiddleware } from './middleware/logger.middleware';
+import { StatusController } from './controllers/status.controller';
 
 @Module({
-  imports: [HttpModule],
-  controllers: [TimerController],
+  controllers: [TimerController, StatusController],
   providers: [
     ConfigService,
     Logger,

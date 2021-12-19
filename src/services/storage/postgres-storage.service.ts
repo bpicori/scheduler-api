@@ -1,9 +1,9 @@
 import { Client } from 'pg';
 import { StorageService } from './storage.service';
-import { PostgresStorageConfig } from '../services/config.service';
+import { PostgresStorageConfig } from '../config.service';
 import { Logger } from '@nestjs/common';
-import { ICommand } from '../types/command';
-import { CommandStatus } from '../types/command-status';
+import { WebHook } from '../../types/webhook';
+import { Status } from '../../types/status';
 
 export class PostgresStorageService extends StorageService {
   private client: Client | null;
@@ -22,40 +22,40 @@ export class PostgresStorageService extends StorageService {
     this.logger.log('Connection initialize', 'PostgresStorageService');
   }
 
-  public async get(id: string): Promise<ICommand | null> {
+  public async get(id: number): Promise<WebHook | null> {
     if (!this.client) {
-      console.log('app module init');
       throw new Error('Postgres connection is not initialized');
     }
-    const res = await this.client.query<ICommand>(
+    const res = await this.client.query<WebHook>(
       `SELECT * FROM ${this.config.table} where id = $1`,
       [id],
     );
     return res.rows[0];
   }
 
-  public async insert(command: ICommand): Promise<void> {
+  public async insert(command: WebHook): Promise<number> {
     if (!this.client) {
       throw new Error('Postgres connection is not initialized');
     }
-    await this.client.query(
-      `INSERT INTO ${this.config.table} (id, time, url, status) VALUES ($1, $2, $3, $4)`,
-      [command.id, command.time, command.url, command.status],
+    const res = await this.client.query(
+      `INSERT INTO ${this.config.table} (time, url, status) VALUES ($1, $2, $3) returning id`,
+      [command.time, command.url, command.status],
     );
+    return res.rows[0].id;
   }
 
-  public async getAllStatusPending(): Promise<ICommand[]> {
+  public async getAllStatusPending(): Promise<WebHook[]> {
     if (!this.client) {
       throw new Error('Postgres connection is not initialized');
     }
-    const res = await this.client.query<ICommand>(
+    const res = await this.client.query<WebHook>(
       `SELECT * FROM ${this.config.table} where status = $1`,
-      [CommandStatus.Pending],
+      [Status.Pending],
     );
     return res.rows;
   }
 
-  public async updateStatus(id: string, status: CommandStatus): Promise<void> {
+  public async updateStatus(id: number, status: Status): Promise<void> {
     if (!this.client) {
       throw new Error('Postgres connection is not initialized');
     }
@@ -63,5 +63,12 @@ export class PostgresStorageService extends StorageService {
       `UPDATE ${this.config.table} SET status = $1 WHERE id = $2`,
       [status, id],
     );
+  }
+
+  public async ping(): Promise<void> {
+    if (!this.client) {
+      throw new Error('Postgres connection is not initialized');
+    }
+    await this.client.query('SELECT 1+1');
   }
 }

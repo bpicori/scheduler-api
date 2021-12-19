@@ -6,8 +6,8 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import { TimerService } from './timer.service';
-import { TimerDto, UUID } from './timer.dto';
+import { TimerService } from '../services/timer.service';
+import { ID, TimerDto } from '../types/timer.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('timers')
@@ -16,7 +16,7 @@ export class TimerController {
   constructor(private readonly timerService: TimerService) {}
 
   @Get(':id')
-  async find(@Param() params: UUID): Promise<number> {
+  async find(@Param() params: ID): Promise<{ id: number; time_left: number }> {
     return this.timerService.find(params.id);
   }
 
