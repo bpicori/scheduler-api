@@ -1,5 +1,11 @@
 import { unix } from './unix';
 
+/**
+ * Convert timer to unix timestamp
+ * @param hours
+ * @param minutes
+ * @param seconds
+ */
 export function convertTimerToUnix({
   hours,
   minutes,

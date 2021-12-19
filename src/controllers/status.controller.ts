@@ -13,6 +13,9 @@ export class StatusController {
     private electionService: ElectionService,
   ) {}
 
+  /**
+   * Health check status. Throw error if not healthy.
+   */
   @Get()
   public async status() {
     await this.storageService.ping();

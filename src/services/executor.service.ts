@@ -7,6 +7,9 @@ import { unix } from '../helpers/unix';
 import axios from 'axios';
 import { addIdToUrl } from '../helpers/addIdToUrl';
 
+/**
+ * Executor Service — Executes the webhooks and update the status in the database.
+ */
 @Injectable()
 export class ExecutorService {
   public constructor(
@@ -15,6 +18,9 @@ export class ExecutorService {
     private logger: Logger,
   ) {}
 
+  /**
+   * Check the cache if the
+   */
   public async executeCycle() {
     const now = unix();
     const commands = await this.cache.get(now);

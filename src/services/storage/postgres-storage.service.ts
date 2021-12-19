@@ -5,6 +5,10 @@ import { Logger } from '@nestjs/common';
 import { WebHook } from '../../types/webhook';
 import { Status } from '../../types/status';
 
+/**
+ * Postgres' storage service using pg driver for PostgreSQL.
+ * // TODO check if it's better migrate it to TypeORM
+ */
 export class PostgresStorageService extends StorageService {
   private client: Client | null;
 

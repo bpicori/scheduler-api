@@ -5,7 +5,6 @@ import {
   NestModule,
   OnModuleInit,
 } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
 import { TimerController } from './controllers/timer.controller';
 import { TimerService } from './services/timer.service';
 import { CronService } from './services/cron.service';
@@ -66,6 +65,9 @@ export class AppModule implements OnModuleInit, NestModule {
     consumer.apply(LoggerMiddleware).forRoutes('*');
   }
 
+  /**
+   * Boostrap of the application. If is replicated, it will start the election process else it will start the cron service.
+   */
   public async onModuleInit(): Promise<any> {
     if (this.config.replicated) {
       this.electionService.init();

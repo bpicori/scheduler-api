@@ -5,6 +5,12 @@ import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 export class LoggerMiddleware implements NestMiddleware {
   private logger = new Logger('HTTP');
 
+  /**
+   * Add a logger middleware to the web server to log all requests coming in
+   * @param request
+   * @param response
+   * @param next
+   */
   use(request: Request, response: Response, next: NextFunction): void {
     response.on('finish', () => {
       const { method, originalUrl } = request;

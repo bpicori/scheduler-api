@@ -12,6 +12,9 @@
   "redis": "redis://redis:6379",
   "replicated": "true",
   "etcd": "http://etcd-1:2380,http://etcd-2:2380,http://etcd-3:2380",
+  "election_key": "scheduler-election",
+  "election_timeout": "10",
+  "election_campaign_pattern": "scheduler",
   "e2e": {
     "api_url": "http://localhost:5000"
   }

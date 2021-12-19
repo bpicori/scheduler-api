@@ -10,11 +10,28 @@ export interface PostgresStorageConfig {
   password: string;
 }
 
+/**
+ * Config service for the application using config package.
+ * @see https://github.com/lorenwest/node-config
+ */
 @Injectable()
 export class ConfigService {
+  public get electionKey(): string {
+    return config.get('election_key');
+  }
+
+  public get electionTimeout(): number {
+    return parseFloat(config.get('election_timeout')) || 10;
+  }
+
+  public get electionCampaignPattern(): string {
+    return config.get('election_campaign_pattern');
+  }
+
   public get httpPort(): number {
     return config.get('port');
   }
+
   public get redisUri(): string {
     return config.get('redis');
   }

@@ -5,6 +5,11 @@ import * as os from 'os';
 import { ExecutorService } from './executor.service';
 import { ConfigService } from './config.service';
 
+/**
+ * Election Service using etcd.
+ * If this instance is a selected leader, starts cron service attaching the second and minutes executor handler
+ * @see https://microsoft.github.io/etcd3/classes/election.html
+ */
 @Injectable()
 export class ElectionService {
   private client: Etcd3;
@@ -21,18 +26,22 @@ export class ElectionService {
     this.client = new Etcd3({
       hosts: this.configService.etcd,
     });
-    this.election = this.client.election('scheduler-election', 10);
+    this.election = this.client.election(
+      this.configService.electionKey,
+      this.configService.electionTimeout,
+    );
     this.logger.log('Init Election', ElectionService.name);
   }
 
   public init() {
     this.logger.log('Init Election', ElectionService.name);
     this.startElection();
-    this.observeLeader();
   }
 
   private startElection() {
-    this.campaign = this.election.campaign(`scheduler-${os.hostname()}`);
+    this.campaign = this.election.campaign(
+      `${this.configService.electionCampaignPattern}-${os.hostname()}`,
+    );
     this.campaign.on('elected', () => {
       this.logger.log('I am the leader', ElectionService.name);
       this.isLeader = true;
@@ -51,24 +60,7 @@ export class ElectionService {
       this.logger.log('Retrying election', ElectionService.name);
       setTimeout(() => {
         this.startElection();
-      }, 5000);
+      }, this.configService.electionTimeout);
     });
-  }
-
-  private async observeLeader() {
-    try {
-      const observer = await this.election.observe();
-      observer.on('change', (leader) => {
-        this.logger.log(
-          `The current leader is: ${leader}`,
-          ElectionService.name,
-        );
-      });
-      observer.on('error', () => {
-        setTimeout(this.observeLeader, 5000);
-      });
-    } catch (err) {
-      this.logger.error('Error in observing leader', err, ElectionService.name);
-    }
   }
 }

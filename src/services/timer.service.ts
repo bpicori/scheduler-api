@@ -13,6 +13,10 @@ export class TimerService {
     private storage: StorageService,
   ) {}
 
+  /**
+   * Get timer by id. Get by id will look from the database.
+   * @param id
+   */
   public async find(id: number): Promise<{ id: number; time_left: number }> {
     const timer = await this.storage.get(id);
     if (!timer) {
@@ -24,6 +28,10 @@ export class TimerService {
     };
   }
 
+  /**
+   * Create a new timer. It will save it in the database and in the cache and will return the id of the timer.
+   * @param timer
+   */
   public async insert(timer: TimerDto): Promise<{ id: number }> {
     const time = convertTimerToUnix({
       hours: timer.hours,

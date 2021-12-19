@@ -4,6 +4,11 @@ import { CacheService } from './cache.service';
 import IoRedis, { Redis } from 'ioredis';
 import { ConfigService } from '../config.service';
 
+/**
+ * An implementation of the CacheService that uses Redis.
+ * The datastructures used is a Redis sets.
+ * @see https://redis.io/commands#set
+ */
 @Injectable()
 export class RedisCacheService implements CacheService {
   private redis?: Redis;
