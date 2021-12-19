@@ -9,13 +9,14 @@ import { Webhook } from './helpers/webhook';
 export let processes: Array<child_process.ChildProcess>;
 export let SuperTest: supertest.SuperTest<supertest.Test>;
 export const webHook = new Webhook(3001);
+export let db: Client;
+export let config: ConfigService;
 
-async function initDatabase(config: ConfigService) {
+async function initDatabase() {
   console.log('Init Database');
-  const client = new Client(config.postgres);
-  await client.connect();
-  await client.query('CREATE DATABASE scheduler_test_database');
-  await client.query(
+  db = new Client(config.postgres);
+  await db.connect();
+  await db.query(
     fs
       .readFileSync(__dirname + '/../../scripts/postgres/timer.sql', 'utf8')
       .toString(),
@@ -32,9 +33,9 @@ async function initBackend(): Promise<void> {
 
 before(async () => {
   console.log('before');
-  const config = new ConfigService();
+  config = new ConfigService();
   await webHook.start();
-  await initDatabase(config);
+  await initDatabase();
   await initBackend();
   SuperTest = supertest(config.getFromPath('e2e.api_url'));
 });

@@ -1,7 +1,7 @@
 import { CommandStatus } from './command-status';
 
 export interface ICommand {
-  id: string;
+  id: number;
   url: string;
   time: number;
   status: CommandStatus;

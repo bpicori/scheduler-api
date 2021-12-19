@@ -1,4 +1,5 @@
-import { IsInt, IsUrl, IsUUID, Max, Min } from 'class-validator';
+import { IsInt, IsUrl, Max, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class TimerDto {
   @IsInt({ message: 'Hours must be an integer' })
@@ -32,7 +33,8 @@ export class TimerDto {
   readonly url!: string;
 }
 
-export class UUID {
-  @IsUUID('4')
-  readonly id!: string;
+export class ID {
+  @IsInt()
+  @Type(() => Number)
+  readonly id!: number;
 }

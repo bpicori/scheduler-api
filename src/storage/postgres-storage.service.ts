@@ -22,9 +22,8 @@ export class PostgresStorageService extends StorageService {
     this.logger.log('Connection initialize', 'PostgresStorageService');
   }
 
-  public async get(id: string): Promise<ICommand | null> {
+  public async get(id: number): Promise<ICommand | null> {
     if (!this.client) {
-      console.log('app module init');
       throw new Error('Postgres connection is not initialized');
     }
     const res = await this.client.query<ICommand>(
@@ -34,14 +33,15 @@ export class PostgresStorageService extends StorageService {
     return res.rows[0];
   }
 
-  public async insert(command: ICommand): Promise<void> {
+  public async insert(command: ICommand): Promise<number> {
     if (!this.client) {
       throw new Error('Postgres connection is not initialized');
     }
-    await this.client.query(
-      `INSERT INTO ${this.config.table} (id, time, url, status) VALUES ($1, $2, $3, $4)`,
-      [command.id, command.time, command.url, command.status],
+    const res = await this.client.query(
+      `INSERT INTO ${this.config.table} (time, url, status) VALUES ($1, $2, $3) returning id`,
+      [command.time, command.url, command.status],
     );
+    return res.rows[0].id;
   }
 
   public async getAllStatusPending(): Promise<ICommand[]> {
@@ -55,7 +55,7 @@ export class PostgresStorageService extends StorageService {
     return res.rows;
   }
 
-  public async updateStatus(id: string, status: CommandStatus): Promise<void> {
+  public async updateStatus(id: number, status: CommandStatus): Promise<void> {
     if (!this.client) {
       throw new Error('Postgres connection is not initialized');
     }

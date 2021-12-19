@@ -14,7 +14,7 @@ export class TimerService {
     private storage: StorageService,
   ) {}
 
-  public async find(id: string): Promise<{ id: string; time_left: number }> {
+  public async find(id: number): Promise<{ id: number; time_left: number }> {
     const timer = await this.storage.get(id);
     if (!timer) {
       throw new HttpException('Timer not found', 400);
@@ -25,30 +25,25 @@ export class TimerService {
     };
   }
 
-  public async insert(timer: TimerDto): Promise<{ id: string }> {
+  public async insert(timer: TimerDto): Promise<{ id: number }> {
     const time = convertTimerToUnix({
       hours: timer.hours,
       minutes: timer.minutes,
       seconds: timer.seconds,
     });
-    const id = uuid();
-    // TODO id numeric from database
-    // TODO url parse to get hostname and pathname and attach id to pathname
-
+    const id = await this.storage.insert({
+      time,
+      status: CommandStatus.Pending,
+      url: timer.url,
+    });
     // set to cache
     await this.cache.set(time, {
-      url: timer.url,
       id,
+      url: timer.url,
       time,
       status: CommandStatus.Pending,
     });
     // save to db
-    await this.storage.insert({
-      id,
-      time,
-      status: CommandStatus.Pending,
-      url: timer.url,
-    });
     return { id };
   }
 }

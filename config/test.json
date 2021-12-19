@@ -5,6 +5,7 @@
     "user": "postgres",
     "host": "localhost",
     "password": "postgres",
+    "database": "scheduler_test_database",
     "port": 5432,
     "table": "timer"
   },

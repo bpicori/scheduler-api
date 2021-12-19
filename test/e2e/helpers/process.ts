@@ -11,11 +11,10 @@ export const sleep = (time: number): Promise<void> => {
 
 const waitForHealthCheck = async (): Promise<void> => {
   const steps = 10;
-  console.log('HEalth check');
   for (let i = 0; i < steps; i++) {
     try {
       await axios.get(`${config.get('e2e.api_url')}/status`);
-      console.log('Server is Running');
+      console.log('Timer Server is Running');
       return;
     } catch (e) {
       if (e instanceof Error) {
@@ -32,7 +31,7 @@ const spawnInProcessPath = async (
   env: Record<string, string | undefined> = {},
   logs = false,
 ): Promise<child_process.ChildProcess> => {
-  const process_path = path.join(__dirname, '../..', projectPath);
+  const process_path = path.join(__dirname, '../../..', projectPath);
   return child_process.fork(process_path, {
     env,
     stdio: logs ? 'inherit' : 'ignore',

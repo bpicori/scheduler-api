@@ -6,6 +6,7 @@ after(async () => {
   const config = new ConfigService();
   const client = new Client(config.postgres);
   await client.connect();
-  await client.query('DROP DATABASE scheduler_test_database');
+  // drop clients backends
+  await client.query(`DROP table  ${config.postgres.table}`);
   processes.forEach((p) => p.send('FINISH'));
 });

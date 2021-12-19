@@ -6,13 +6,14 @@ import { CommandStatus } from '../types/command-status';
 import { ICommand } from '../types/command';
 import { CacheService } from '../storage/cache.service';
 import { unix } from '../helpers/unix';
+import axios from 'axios';
+import { addIdToUrl } from '../helpers/addIdToUrl';
 
 @Injectable()
 export class ExecutorService {
   public constructor(
     private cache: CacheService,
     private storage: StorageService,
-    private httpService: HttpService,
     private logger: Logger,
   ) {}
 
@@ -55,8 +56,9 @@ export class ExecutorService {
   }
 
   public async execute(command: ICommand): Promise<void> {
+    const url = addIdToUrl(command.url, command.id);
     try {
-      await lastValueFrom(this.httpService.post(`${command.url}`));
+      await axios.post(url, {});
       this.logger.debug(
         `Webhook: ${command.url} executed successfully`,
         ExecutorService.name,
@@ -65,12 +67,12 @@ export class ExecutorService {
     } catch (error) {
       if (error instanceof Error) {
         this.logger.error(
-          `Webhook: ${command.url} failed with error: ${error.message}`,
+          `Webhook: ${url} failed with error: ${error.message}`,
           ExecutorService.name,
         );
       } else {
         this.logger.error(
-          `Webhook: ${command.url} failed with unknown error`,
+          `Webhook: ${url} failed with unknown error`,
           ExecutorService.name,
         );
       }

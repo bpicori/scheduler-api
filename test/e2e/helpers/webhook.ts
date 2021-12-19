@@ -8,25 +8,25 @@ export class Webhook extends EventEmitter {
 
   public async start() {
     const app = express();
-    app.get('/:id', (req, res) => {
-      const url = `http://localhost:${this.port}/${req.params.id}`;
-      this.emit(url, { ok: true });
+    app.post('/:id', (req, res) => {
+      const id = req.params.id;
+      this.emit(id, { ok: true });
       res.send('ok');
     });
 
     app.listen(this.port, () => {
-      console.log(`Example app listening at http://localhost:${this.port}`);
+      console.log(`Webhook server is running http://localhost:${this.port}`);
     });
   }
 
-  public waitFor(url: string, timeout: number) {
+  public waitFor(id: number, timeout: number) {
     return new Promise((resolve, reject) => {
-      this.once(url, (data) => {
+      this.once(id.toString(), (data) => {
         resolve(data);
       });
       setTimeout(() => {
         reject(new Error('Timeout'));
-      }, timeout);
+      }, timeout * 1000);
     });
   }
 }

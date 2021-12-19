@@ -25,9 +25,11 @@ build:
 	docker-compose ${composeFiles} build $(filter-out $@,$(MAKECMDGOALS))
 
 migrate-up:
-	docker-compose exec postgres psql -U postgres -d scheduler_database -f scripts/postgres/timer.sql
+	docker-compose ${composeFiles} exec postgres psql -U postgres -d scheduler_database -f scripts/postgres/timer.sql
+	docker-compose ${composeFiles} exec postgres psql -U postgres -c 'create database scheduler_test_database;'
 
 migrate-down:
-	docker-compose exec postgres psql -U postgres -d scheduler_database -c 'drop table timer;;'
+	docker-compose ${composeFiles} exec postgres psql -U postgres -d scheduler_database -c 'drop table timer;'
+	docker-compose ${composeFiles} exec postgres psql -U postgres -c 'drop database scheduler_test_database;'
 
 
