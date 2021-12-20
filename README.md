@@ -25,16 +25,15 @@ This microservice starts with 2 intervals: 1 every second to run the upcoming we
 
 ## Setup Singleton
 ```bash
+npm install
 make up-singleton # to run the application in singleton mode
-```
-```bash
 make migrate-up # to create the table in the database
-``` 
+```
 The port is set to 5000.
 ```bash
 make logs scheduler # to see the logs
 ```
-Curl Example for creating a webhook and getting it by id:
+Curl Example for creating a webhook:
 ```bash
 curl --location --request POST 'http://localhost:5000/timers' \
 --header 'Content-Type: application/json' \
@@ -45,27 +44,26 @@ curl --location --request POST 'http://localhost:5000/timers' \
     "url": "http://localhost:3001"
 }'
 ```
+Curl Example for getting a timer:
 ```bash
 curl --location --request GET 'http://localhost:5000/timers/1'
 ```
 
 
 ## Setup Replicated
-```bash 
-make up-replicated # to start the application in replicated mode
-```
 ```bash
+npm install
+make up-replicated # to start the application in replicated mode
 make migrate-up # to create the table in db
 ``` 
-When starting replicated, the traffic will pass from nginx at port 8080.
 
 ```bash
 make logs scheduler1 # to see the logs
 make logs scheduler2 # to see the logs
 make logs scheduler3 # to see the logs
 ```
-
-Curl Example for creating a webhook and getting it by id:
+When starting replicated, the traffic will pass from nginx at port 8080.
+Curl Example for creating a webhook:
 ```bash
 curl --location --request POST 'http://localhost:8080/timers' \
 --header 'Content-Type: application/json' \
@@ -76,6 +74,7 @@ curl --location --request POST 'http://localhost:8080/timers' \
     "url": "http://localhost:3001"
 }'
 ```
+Curl Example for getting a timer:
 ```bash
 curl --location --request GET 'http://localhost:8080/timers/1'
 ```
