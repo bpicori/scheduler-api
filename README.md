@@ -18,9 +18,9 @@ This microservice starts with 2 intervals: 1 every second to run the upcoming we
 * cache (in memory if started singleton and Redis if started replicated)
 
 ## Requirements
-1. Docker (tested using version 20.10.1)
-2. docker-compose (tested using version 1.29.2)
-3. Make for simplicity :) 
+1. `docker` (tested using version 20.10.1)
+2. `docker-compose` (tested using version 1.29.2)
+3. `make` for simplicity :) 
 
 
 ## Setup Singleton
